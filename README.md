@@ -55,14 +55,14 @@ npm i less less-loader@5 -D
 const { override, fixBabelImports, addLessLoader } = require('customize-cra');
 
 module.exports = override(
-	fixBabelImports('antd', {
-		libraryDirectory: 'es',
-		style: true
-	}),
-	addLessLoader({
-		javascriptEnabled: true,
-		modifyVars: require('./theme')
-	})
+    fixBabelImports('antd', {
+        libraryDirectory: 'es',
+        style: true
+    }),
+    addLessLoader({
+        javascriptEnabled: true,
+        modifyVars: require('./theme')
+    })
 );
 ```
 
@@ -77,10 +77,10 @@ import { ConfigProvider } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
 
 ReactDOM.render(
-	<ConfigProvider locale={zhCN}>
-		<App />
-	</ConfigProvider>,
-	document.getElementById('root')
+    <ConfigProvider locale={zhCN}>
+        <App />
+    </ConfigProvider>,
+    document.getElementById('root')
 );
 ```
 
@@ -105,27 +105,27 @@ import Login from './pages/login';
 import NotFound from './common/notfound';
 
 ReactDOM.render(
-	<ConfigProvider locale={zhCN}>
-		<Router>
-			<Switch>
-				{/* 1. 默认路由 */}
-				<Redirect from="/" to="/admin" exact />
-				{/* 2. 无需登录 */}
-				<Route path="/login" component={Login} />
-				{/* 3. 需要登录 */}
-				<Route
-					path="/admin"
-					render={props => {
-						// 【登录状态监测】
-						return <App {...props} />;
-					}}
-				/>
-				{/* 4. Not Found */}
-				<Route component={NotFound} />
-			</Switch>
-		</Router>
-	</ConfigProvider>,
-	document.getElementById('root')
+    <ConfigProvider locale={zhCN}>
+        <Router>
+            <Switch>
+                {/* 1. 默认路由 */}
+                <Redirect from="/" to="/admin" exact />
+                {/* 2. 无需登录 */}
+                <Route path="/login" component={Login} />
+                {/* 3. 需要登录 */}
+                <Route
+                    path="/admin"
+                    render={props => {
+                        // 【登录状态监测】
+                        return <App {...props} />;
+                    }}
+                />
+                {/* 4. Not Found */}
+                <Route component={NotFound} />
+            </Switch>
+        </Router>
+    </ConfigProvider>,
+    document.getElementById('root')
 );
 ```
 
@@ -140,16 +140,81 @@ import Article from './pages/article';
 import NotFound from './common/notfound';
 
 export default class App extends Component {
-	render() {
-		return (
-			<Switch>
-				<Redirect from="/admin" to="/admin/user" exact />
-				{/* 用 render 渲染方便后续做 RBAC 鉴权 */}
-				<Route path="/admin/user" render={props => <User {...props} />} />
-				<Route path="/admin/article" component={Article} />
-				<Route component={NotFound} />
-			</Switch>
-		);
-	}
+    render() {
+        return (
+            <Switch>
+                <Redirect from="/admin" to="/admin/user" exact />
+                {/* 用 render 渲染方便后续做 RBAC 鉴权 */}
+                <Route path="/admin/user" render={props => <User {...props} />} />
+                <Route path="/admin/article" component={Article} />
+                <Route component={NotFound} />
+            </Switch>
+        );
+    }
+}
+```
+
+## 基本界面
+
+支持装饰器
+
+```
+npm i @babel/plugin-proposal-decorators -D
+```
+
+config-overrides.js
+
+```javascript
+const { addDecoratorsLegacy } = require('customize-cra');
+module.exports = override( addDecoratorsLegacy() );
+```
+
+src/App.js
+
+```javascript
+import React, { Component } from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
+
+import NotFound from './common/notfound';
+
+import User from './pages/user';
+import Article from './pages/article';
+import Setting from './pages/setting';
+
+import Frame from './common/frame';
+
+export default class App extends Component {
+    getTitle = () => {
+        switch (this.props.location.pathname) {
+            case '/admin/user':
+                return '用户中心';
+            case '/admin/article':
+                return '文章管理';
+            case '/admin/setting':
+                return '网站设置';
+            default:
+                return '圈子后台管理系统';
+        }
+    };
+    componentDidMount() {
+        document.title = this.getTitle();
+    }
+    componentDidUpdate() {
+        document.title = this.getTitle();
+    }
+    render() {
+        return (
+            <Frame>
+                <Switch>
+                    <Redirect from="/admin" to="/admin/user" exact />
+                    {/* 用 render 渲染方便后续做 RBAC 鉴权 */}
+                    <Route path="/admin/user" render={props => <User {...props} />} />
+                    <Route path="/admin/article" component={Article} />
+                    <Route path="/admin/setting" component={Setting} />
+                    <Route component={NotFound} />
+                </Switch>
+            </Frame>
+        );
+    }
 }
 ```

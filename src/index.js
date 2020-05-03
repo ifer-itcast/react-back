@@ -7,6 +7,8 @@ import App from './App';
 import Login from './pages/login';
 import NotFound from './common/notfound';
 
+import './index.less';
+
 ReactDOM.render(
 	<ConfigProvider locale={zhCN}>
 		<Router>
