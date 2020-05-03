@@ -83,3 +83,73 @@ ReactDOM.render(
 	document.getElementById('root')
 );
 ```
+
+## 路由设计
+
+```
+npm i react-router-dom
+```
+
+要考虑是否登录，以及登录后的 RBAC（基于角色的权限管理），默认路由跳转，无需登录路由（/login），需登录路由（/admin/xxx），最后的 404 处理。
+
+src/index.js
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/es/locale/zh_CN';
+import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import App from './App';
+import Login from './pages/login';
+import NotFound from './common/notfound';
+
+ReactDOM.render(
+	<ConfigProvider locale={zhCN}>
+		<Router>
+			<Switch>
+				{/* 1. 默认路由 */}
+				<Redirect from="/" to="/admin" exact />
+				{/* 2. 无需登录 */}
+				<Route path="/login" component={Login} />
+				{/* 3. 需要登录 */}
+				<Route
+					path="/admin"
+					render={props => {
+						// 【登录状态监测】
+						return <App {...props} />;
+					}}
+				/>
+				{/* 4. Not Found */}
+				<Route component={NotFound} />
+			</Switch>
+		</Router>
+	</ConfigProvider>,
+	document.getElementById('root')
+);
+```
+
+src/App.js
+
+```javascript
+import React, { Component } from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
+
+import User from './pages/user';
+import Article from './pages/article';
+import NotFound from './common/notfound';
+
+export default class App extends Component {
+	render() {
+		return (
+			<Switch>
+				<Redirect from="/admin" to="/admin/user" exact />
+				{/* 用 render 渲染方便后续做 RBAC 鉴权 */}
+				<Route path="/admin/user" render={props => <User {...props} />} />
+				<Route path="/admin/article" component={Article} />
+				<Route component={NotFound} />
+			</Switch>
+		);
+	}
+}
+```
