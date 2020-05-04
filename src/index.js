@@ -6,8 +6,10 @@ import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import App from './App';
 import Login from './pages/login';
 import NotFound from './common/notfound';
-
+import axios from './utils/http';
 import './index.less';
+
+React.Component.prototype.$axios = axios;
 
 ReactDOM.render(
 	<ConfigProvider locale={zhCN}>
