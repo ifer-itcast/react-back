@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-
-import NotFound from './common/notfound';
-
-import User from './pages/user';
-import Article from './pages/article';
-import Setting from './pages/setting';
-
-import Frame from './common/frame';
+import { Frame, NotFound } from './common';
+import { User, Article, Setting } from './pages';
 
 export default class App extends Component {
 	getTitle = () => {

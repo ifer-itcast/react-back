@@ -371,3 +371,10 @@ export default {
 	jumptUser: () => push('/admin/user')
 };
 ```
+
+## react-loadable
+
+```javascript
+// 路由懒加载
+npm i react-loadable
+```
