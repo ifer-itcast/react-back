@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
-import { Table } from 'antd';
+import { Table, Button } from 'antd';
 import { actionCreators } from './store';
 import './style.less';
 
@@ -59,19 +59,22 @@ class Article extends Component {
 			return <div>error</div>;
 		} else {
 			return (
-				<Table
-					columns={this.formatColumn()}
-					dataSource={this.formatData(list)}
-					loading={isFetching}
-					pagination={{
-						total: 100,
-						defaultCurrent: 1,
-						showSizeChanger: false,
-						onChange: (page, pageSize) => {
-							this.props.getList(page, pageSize);
-						}
-					}}
-				/>
+				<Fragment>
+					<Button onClick={this.props.jumptUser}>用户中心</Button>
+					<Table
+						columns={this.formatColumn()}
+						dataSource={this.formatData(list)}
+						loading={isFetching}
+						pagination={{
+							total: 100,
+							defaultCurrent: 1,
+							showSizeChanger: false,
+							onChange: (page, pageSize) => {
+								this.props.getList(page, pageSize);
+							}
+						}}
+					/>
+				</Fragment>
 			);
 		}
 	}
@@ -80,9 +83,5 @@ class Article extends Component {
 const mapStateToProps = state => ({
 	article: state.article
 });
-const mapDispatchToProps = dispatch => ({
-	getList(page, pageSize) {
-		dispatch(actionCreators.getList(page, pageSize));
-	}
-});
-export default connect(mapStateToProps, mapDispatchToProps)(Article);
+
+export default connect(mapStateToProps, actionCreators)(Article);

@@ -234,8 +234,8 @@ import { message } from 'antd';
 
 // set NODE_ENV=development&&react-app-rewired start
 axios.defaults.baseURL = [
-	{ type: 'development', url: 'https://cnodejs.org/api/v1' },
-	{ type: 'production', url: 'http://127.0.0.1:3000' }
+    { type: 'development', url: 'https://cnodejs.org/api/v1' },
+    { type: 'production', url: 'http://127.0.0.1:3000' }
 ].find(item => process.env.NODE_ENV === item.type).url;
 
 axios.defaults.timeout = 10000; // Timeout
@@ -248,25 +248,25 @@ axios.defaults.transformRequest = data => qs.stringify(data);
 // Token save to redux or local
 let hide = null;
 axios.interceptors.request.use(
-	config => {
-		hide = message.loading('loading...');
-		const token = localStorage.getItem('token');
-		token && (config.headers.Authorization = token);
-		return config;
-	},
-	error => Promise.reject(error)
+    config => {
+        hide = message.loading('loading...');
+        const token = localStorage.getItem('token');
+        token && (config.headers.Authorization = token);
+        return config;
+    },
+    error => Promise.reject(error)
 );
 
 axios.interceptors.response.use(
-	res => {
-		// Hide loading tips...
-		hide && hide();
-		return res.data;
-	},
-	error => {
-		hide && hide();
-		return Promise.reject(error)
-	}
+    res => {
+        // Hide loading tips...
+        hide && hide();
+        return res.data;
+    },
+    error => {
+        hide && hide();
+        return Promise.reject(error)
+    }
 );
 
 export default axios;
@@ -294,16 +294,80 @@ src/store/reducer.js
 import { combineReducers } from 'redux';
 import { reducer as articleReducer } from '../pages/article/store';
 export default combineReducers({
-	article: articleReducer
+    article: articleReducer
 });
 ```
 
 src/pages/article/store/index.js
 
 ```javascript
-import * as actionCreators from './actionCreators';
 import * as actionTypes from './actionTypes';
+import actionCreators from './actionCreators';
 import reducer from './reducer';
 
 export { reducer, actionCreators, actionTypes };
+```
+
+## connected-react-router
+
+```
+npm i connected-react-router
+```
+
+Step1: src/store/reducer.js
+
+```javascript
+import { combineReducers } from 'redux';
+import { connectRouter } from 'connected-react-router';
+import { reducer as articleReducer } from '../pages/article/store';
+import history from '../utils/history';
+
+export default combineReducers({
+    router: connectRouter(history),
+    article: articleReducer
+});
+```
+
+Step2: src/store/index.js
+
+```javascript
+import { createStore, compose, applyMiddleware } from 'redux';
+import promise from 'redux-promise-middleware';
+import reducer from './reducer';
+import history from '../utils/history';
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+export default createStore(reducer, composeEnhancers(applyMiddleware(history, promise)));
+```
+
+Step3: src/index.js
+
+```javascript
+import { ConnectedRouter } from 'connected-react-router';
+import Login from './pages/login';
+
+ReactDOM.render(
+    <ConfigProvider locale={zhCN}>
+        <Provider store={store}>
+            <ConnectedRouter history={history}>
+                <Router>
+                    <Switch>
+                        
+                    </Switch>
+                </Router>
+            </ConnectedRouter>
+        </Provider>
+    </ConfigProvider>,
+    document.getElementById('root')
+);
+```
+
+Step4: 使用
+
+actionCreator.js
+
+```javascript
+import { push } from 'connected-react-router';
+export default {
+	jumptUser: () => push('/admin/user')
+};
 ```
