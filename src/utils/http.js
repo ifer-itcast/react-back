@@ -1,6 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
-import { message } from 'antd';
+import NProgress from 'nprogress';
 
 // set NODE_ENV=development&&react-app-rewired start
 axios.defaults.baseURL = [
@@ -16,10 +16,9 @@ axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.transformRequest = data => qs.stringify(data);
 
 // Token save to redux or local
-let hide = null;
 axios.interceptors.request.use(
 	config => {
-		hide = message.loading('loading...');
+		NProgress.start();
 		const token = localStorage.getItem('token');
 		token && (config.headers.Authorization = token);
 		return config;
@@ -30,12 +29,12 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
 	res => {
 		// Hide loading tips...
-		hide && hide();
+		NProgress.done();
 		return res.data;
 	},
 	error => {
-		hide && hide();
-		return Promise.reject(error)
+		NProgress.done();
+		return Promise.reject(error);
 	}
 );
 

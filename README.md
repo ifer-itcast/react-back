@@ -271,3 +271,39 @@ axios.interceptors.response.use(
 
 export default axios;
 ```
+
+## Redux 配置
+
+```
+npm i redux react-redux redux-promise-middleware
+```
+
+src/store/index.js
+
+```javascript
+import { createStore, compose, applyMiddleware } from 'redux';
+import promise from 'redux-promise-middleware';
+import reducer from './reducer';
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+export default createStore(reducer, composeEnhancers(applyMiddleware(promise)));
+```
+
+src/store/reducer.js
+
+```javascript
+import { combineReducers } from 'redux';
+import { reducer as articleReducer } from '../pages/article/store';
+export default combineReducers({
+	article: articleReducer
+});
+```
+
+src/pages/article/store/index.js
+
+```javascript
+import * as actionCreators from './actionCreators';
+import * as actionTypes from './actionTypes';
+import reducer from './reducer';
+
+export { reducer, actionCreators, actionTypes };
+```
